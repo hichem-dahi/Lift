@@ -1,0 +1,79 @@
+.feed-wrapper {
+  @apply h-screen;
+  background-color: #F3F3F3;
+  color: #575757;
+}
+
+.feedbar {
+  @apply flex justify-between items-center p-2 bg-white;
+}
+
+.logo-line {
+  @apply center-line;
+}
+
+.logo {
+  @apply p-2;
+}
+
+.new-post-card {
+  @apply mt-10 mx-4 rounded-3xl;
+  background-color: #E7E7E7;
+}
+
+.new-post-title {
+  @apply pb-4;
+}
+
+.new-post-body {
+  @apply flex pb-2;
+}
+
+.new-post-body-avatar {
+  @apply mr-3;
+}
+
+.new-post-body-input {
+  @apply w-full;
+} 
+
+.new-post-input-actions {
+  @apply flex justify-end mt-2;
+}
+
+.post-card {
+  @apply shadow-md bg-gray-50 mt-12 px-4 pb-4;
+  background-color: #F6F6F6;
+  border-radius: 4rem;
+}
+
+.center-line {
+  @apply flex items-center;
+}
+
+.post-card-profile-line {
+  @apply center-line p-2 mb-1;
+}
+
+.post-card-body {
+  @apply px-8;
+}
+
+.post-card-actions {
+  @apply center-line mt-4 px-5 font-light;
+}
+
+.post-card-likes-line {
+  @apply center-line;
+}
+
+.post-card-comments-line {
+  @apply center-line ml-3;
+}
+.post-card-comments-section {
+  @apply center-line bg-white rounded-full text-xs m-2;
+}
+
+.btn {
+  letter-spacing: 0.2rem;
+}
