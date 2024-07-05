@@ -1,0 +1,26 @@
+[
+  {
+    "id": 1,
+    "body": "Why don't scientists trust atoms? Because they make up everything!",
+    "userId": 1,
+    "commentsId": [1, 2],
+    "likes": 120,
+    "numberOfComments": 2
+  },
+  {
+    "id": 2,
+    "body": "Why did the scarecrow win an award? Because he was outstanding in his field!",
+    "userId": 2,
+    "commentsId": [3],
+    "likes": 85,
+    "numberOfComments": 1
+  },
+  {
+    "id": 3,
+    "body": "I told my wife she was drawing her eyebrows too high. She looked surprised.",
+    "userId": 3,
+    "commentsId": [],
+    "likes": 95,
+    "numberOfComments": 0
+  }
+]

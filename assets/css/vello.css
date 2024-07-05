@@ -1,11 +1,12 @@
 .feed-wrapper {
-  @apply h-screen;
-  background-color: #F3F3F3;
+  @apply h-screen text-xs pt-12;
+  background-color: #ffffff;
   color: #575757;
 }
 
 .feedbar {
-  @apply flex justify-between items-center p-2 bg-white;
+  @apply flex justify-between items-center p-2 pt-4 bg-white w-full fixed;
+  z-index: 2;
 }
 
 .logo-line {
@@ -13,16 +14,16 @@
 }
 
 .logo {
-  @apply p-2;
+  @apply px-2;
 }
 
 .new-post-card {
   @apply mt-10 mx-4 rounded-3xl;
-  background-color: #E7E7E7;
+  background-color: #EAEAEA;
 }
 
 .new-post-title {
-  @apply pb-4;
+  @apply text-sm pb-4;
 }
 
 .new-post-body {
@@ -42,8 +43,8 @@
 }
 
 .post-card {
-  @apply shadow-md bg-gray-50 mt-12 px-4 pb-4;
-  background-color: #F6F6F6;
+  @apply shadow-md bg-gray-50 mt-6 px-4 pb-4 z-50;
+  background-color: #FAFAFA;
   border-radius: 4rem;
 }
 
@@ -63,17 +64,48 @@
   @apply center-line mt-4 px-5 font-light;
 }
 
-.post-card-likes-line {
-  @apply center-line;
+.post-card-likes {
+  @apply flex items-start;
 }
 
-.post-card-comments-line {
-  @apply center-line ml-3;
+.post-card-comments {
+  @apply flex items-start ml-3;
 }
+
 .post-card-comments-section {
-  @apply center-line bg-white rounded-full text-xs m-2;
+  @apply flex flex-col mt-2;
+}
+
+.post-card-comment-line {
+  @apply center-line rounded-full px-2 m-1;
+  font-size: 0.6rem;
+}
+
+.post-card-recent-comment-line {
+  @apply center-line rounded-full border border-blue-200 px-1 m-1;
+  font-size: 0.6rem;
 }
 
 .btn {
   letter-spacing: 0.2rem;
+}
+
+.profile-short-form {
+  @apply flex items-center text-xs p-1 min-h-10;
+}
+
+.profile-long-form {
+  @apply flex items-start text-xs p-1 min-h-10;
+}
+
+.profile-form-icon {
+  @apply p-1 text-gray-400;
+}
+
+.add-comment-wrapper {
+  @apply fixed bottom-0 right-0 left-0 w-full z-10;
+}
+
+.add-comment-card {
+  @apply flex items-center justify-between rounded-full p-1 ml-2 w-full;
 }

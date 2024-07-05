@@ -1,0 +1,35 @@
+[
+  {
+    "id": 1,
+    "username": "science_guy",
+    "first_name": "John",
+    "last_name": "Doe",
+    "email": "john.doe@example.com",
+    "bio": "I love making people laugh with science jokes.",
+    "image": "",
+    "postsId": [1],
+    "commentsId": [3]
+  },
+  {
+    "id": 2,
+    "username": "funny_farmer",
+    "first_name": "Jane",
+    "last_name": "Smith",
+    "email": "jane.smith@example.com",
+    "bio": "A farmer with a sense of humor.",
+    "image": "",
+    "postsId": [2],
+    "commentsId": [1]
+  },
+  {
+    "id": 3,
+    "username": "eyebrow_artist",
+    "first_name": "Alice",
+    "last_name": "Johnson",
+    "email": "alice.johnson@example.com",
+    "bio": "I find humor in the little things.",
+    "image": "",
+    "postsId": [3],
+    "commentsId": [2]
+  }
+]

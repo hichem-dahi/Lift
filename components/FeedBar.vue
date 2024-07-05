@@ -1,7 +1,7 @@
 <template>
   <div class="feedbar">  
     <div class="logo-line">   
-      <img class="logo" :src="logo"> 
+      <img width="45" class="logo" :src="logo"> 
       <h4 class="font-semibold text-gray-500">Hkinect</h4> 
     </div>
 

@@ -4,6 +4,10 @@
 
 <script setup lang="ts">
 const router = useRouter()
+const route = useRoute()
 
-router.push('/feed')
+onMounted(() => {
+  if (route.path === '/')
+    router.push('/feed')
+})
 </script>

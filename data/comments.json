@@ -1,0 +1,20 @@
+[
+  {
+    "id": 1,
+    "body": "Haha, that's a good one!",
+    "userId": 2,
+    "postId": 1
+  },
+  {
+    "id": 2,
+    "body": "I love science jokes!",
+    "userId": 3,
+    "postId": 1
+  },
+  {
+    "id": 3,
+    "body": "Classic!",
+    "userId": 1,
+    "postId": 2
+  }
+]
