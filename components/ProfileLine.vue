@@ -43,21 +43,23 @@
 </template>
 
 <script setup lang="ts">
-import { ProperProfileFormKeys, type FormUser } from '~/models/User';
+import { ProperProfileInfoKeys, type User} from '~/models/User';
 
-const props = defineProps<{formKey: keyof FormUser}>()
-const value = defineModel<string | number>()
+const props = defineProps<{formKey: keyof User}>()
+const emits = defineEmits(['update-profile'])
+const value = defineModel<any>()
 
 const valueTmp = ref(value.value)
 const isModify = ref(false)
 
-const title = computed(() => ProperProfileFormKeys[props.formKey])
+const title = computed(() => ProperProfileInfoKeys[props.formKey])
 
-const isLongForm = computed(() => props.formKey.includes('bio'))
+const isLongForm = computed(() => props.formKey.includes('bio') || false)
 
 function confirmChange() {
   value.value = valueTmp.value
   isModify.value = false
+  emits('update-profile')
 }
 
 function cancelChange() {

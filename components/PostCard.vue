@@ -1,21 +1,32 @@
 <template>
   <div v-if="post" class="post-card">
-    <div class="post-card-profile-line font-light">
-      <UAvatar class="m-2" src="https://avatars.githubusercontent.com/u/739984?v=4" size="sm" />       
-      <div>{{ name }}</div>
+    <div class="center-line justify-between">
+      <div class="post-card-profile-line font-light">
+        <UAvatar class="m-2" :src="avatarSrc" size="sm" />       
+        <div>{{  post.full_name }}</div>
+      </div>
+      <UPopover>
+        <UButton size="2xs" color="grey" icon="i-mdi-dots-vertical" variant="ghost" />
+        <template #panel>
+          <div class="p-1">
+            <UButton :disabled="!ownPost" size="2xs" color="grey" variant="ghost" @click="deletePost">Delete</UButton>
+          </div>
+        </template>
+      </UPopover>
     </div>
-    
+   
+
     <div class="post-card-body">{{ post.body }}</div>
 
     <div class="post-card-actions">
       <div @click="likePost()" class="post-card-likes">
         <UIcon class="mx-2" name="i-mdi-emoticon-excited-outline" />
-        <div>{{ post.likes }} likes</div> 
+        <div>{{ post.user_likes?.length }} likes</div> 
       </div>
 
       <div class="post-card-comments" @click="openComments">
         <UIcon class="mx-2" name="i-mdi-message-outline" />
-        <div>{{ post.numberOfComments }} comments</div>
+        <div>{{ comments.length }} comments</div>
       </div>
     </div>
 
@@ -27,8 +38,7 @@
       <template v-for="i of commentsToDisplay" :key="i-1">
         <CommentLine v-if="comments[i-1]" :comment="comments[i-1]" />
       </template>
-
-      <div v-if="commentsToDisplay < comments.length" class="comments-section-more-btn self-center">
+      <div v-if="isShowMoreComments" class="comments-section-more-btn self-center">
         <div class="text-center">...</div>
         <UButton class="self-center" 
           size="lg"
@@ -42,55 +52,124 @@
 </template>
 
 <script setup lang="ts">
-import type { Comment, Post } from '~/models/Post';
+import type { Post, PostInfo } from '~/models/Post';
 
-import usersJson from '@/data/users.json'
-import commentsJson from '@/data/comments.json'
+import { useAuthStore } from '~/store/useAuthStore';
 
-const props = defineProps<{ post?: Post}>()
+import { useGetAvatarApi } from '~/composables/api/profiles/useGetAvatarApi';
+import { usePostCommentApi } from '~/composables/api/usePostCommentApi';
+import { useGetCommentsApi } from '~/composables/api/useGetCommentsApi';
+import { useUpdatePostApi } from '~/composables/api/posts/useUpdatePostApi';
+import { useGetPostApi } from '~/composables/api/posts/useGetPostApi';
+import { useDeletePostApi } from '~/composables/api/posts/useDeletePostApi';
 
-const usersData = ref(usersJson)
-const commentsData = ref<Comment[]>(commentsJson)
+//const post = defineModel<PostInfo>()
+const props = defineProps<{post?: PostInfo}>()
+const authStore = useAuthStore()
+
+const getAvatarApi = useGetAvatarApi()
+const postCommentApi = usePostCommentApi()
+const getCommentsApi = useGetCommentsApi()
+const updatePostApi = useUpdatePostApi()
+const getPostApi = useGetPostApi()
+const deletePostApi = useDeletePostApi()
 
 const commentsToDisplay = ref(3)
 const showComments = ref(false)
-const isLike = ref(false)
 
-const name = computed(() => { 
-  const user = usersData.value.find(item => item.id === props.post?.userId)
-  return props.post ? `${user?.first_name} ${user?.last_name}` : ''
-})
+if (props.post?.id)
+  getCommentsApi.params.value.post_id = props.post?.id
 
-const comments = computed(() => {
-  if (props.post) 
-    return commentsData.value.filter(item => props.post?.id === item.postId)
-  else return []
-})
+if (props.post?.avatar_url)
+  getAvatarApi.params.value.path = props.post.avatar_url
 
-if(commentsToDisplay.value > comments.value.length) {
-  commentsToDisplay.value = comments.value.length
-}
+const avatarSrc = computed(() => getAvatarApi.data.value ? URL.createObjectURL(getAvatarApi.data.value) : undefined)
+const comments = computed(() => getCommentsApi.data.value || [])
+const ownPost = computed(() => authStore.user?.id === props.post?.user_id)
+const isShowMoreComments = computed(() => commentsToDisplay.value < comments.value.length)
+const isLiked = computed(() => authStore.user?.id ? props.post?.user_likes?.includes(authStore.user?.id) : false)
 
 function likePost() {
-  if(!isLike.value && props.post)
-    props.post.likes++
-  else if(isLike.value && props.post)
-    props.post.likes--
+  if (props.post?.user_likes && authStore.user?.id) {
+
+    if (!isLiked.value) {
+      updatePostApi.params.value.post = { 
+        id: props.post.id, 
+        user_likes: [...props.post.user_likes, authStore.user?.id], 
+        updated_at: new Date() 
+      } 
+    } else if (isLiked.value) {
+      updatePostApi.params.value.post = { 
+        id: props.post.id, 
+        user_likes: props.post.user_likes.filter(userId => userId !== authStore.user?.id), 
+        updated_at: new Date()
+      } 
+    }}
 }
 
 function openComments() {
   showComments.value = !showComments.value
+  if (!showComments.value) {
+    commentsToDisplay.value = 3
+  }
 }
 
 function showMoreComments() {
   commentsToDisplay.value += 3
-  if (comments.value.length <= commentsToDisplay.value + 3)
-    commentsToDisplay.value = comments.value.length
 }
 
 function addComment(body: string) {
   commentsToDisplay.value++
-  if (props.post?.id)
-    commentsData.value.unshift({id: 1, body, userId: 1, postId: props.post?.id, recent: true})
+  if (props.post?.id && authStore.user?.id) {
+    postCommentApi.params.value.comment = { 
+      body, 
+      post_id: props.post.id, 
+      user_id: authStore.user?.id, 
+      updated_at: new Date() 
+    }
+    postCommentApi.execute()
+  }
 }
+
+function deletePost() {
+  if (ownPost) {
+    deletePostApi.params.value.postId = props.post?.id
+    deletePostApi.execute()
+  }
+}
+
+watchEffect(() => {
+  if (comments.value.length && commentsToDisplay.value > comments.value.length) 
+    commentsToDisplay.value = comments.value.length
+})
+
+watch(() => updatePostApi.success.value, (success) => {
+  if (success) {
+    getPostApi.params.value.postId = props.post?.id
+    getPostApi.execute()
+  }
+})
+
+/*watch(() => getPostApi.success.value, (success) => {
+  if (success && getPostApi.data.value) 
+    props.post = getPostApi.data.value
+  else 
+    props.post = undefined
+  debugger
+})*/
+
+watch(() => deletePostApi.success.value, (success) => {
+  if (success) {
+    getPostApi.params.value.postId = props.post?.id
+    getPostApi.execute()
+  }
+})
+
+watch(() => postCommentApi.success.value, (success) => {
+  if (success) {
+    getCommentsApi.params.value.post_id = props.post?.id
+    getCommentsApi.execute()
+  }
+})
+
 </script>

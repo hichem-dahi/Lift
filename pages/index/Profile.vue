@@ -4,38 +4,49 @@
     <div class="font-semi-bold">Profile</div> 
   </div>
   <hr>
+  <div class="flex justify-end">
+    <UButton size="2xs"  variant="ghost" color="blue" @click="signOut()">sign out</UButton>
+  </div>
 
-  <div class="center-line justify-center p-4 mt-3">
-    <div class="flex flex-col items-center justify-center">  
-      <UAvatar size="xl" src="https://avatars.githubusercontent.com/u/739984?v=4" />
-      <div class="font-semi-bold text-sm text-blue-500 p-3">Edit profile image</div>
-    </div>
+  <div class="center-line justify-center p-2">
+    <Avatar v-if="authStore.user?.avatar_url" v-model:path="authStore.user.avatar_url" @upload="updateProfile" :size="10" />
   </div>
 
   <div class="p-4">
-    <template v-for="(_,key) in formUser" :key="key">
+    <template v-if="profileForm" v-for="(_, key) in profileForm" :key="key">
       <ProfileLine 
-        v-if="ProperProfileFormKeys[key]"
-        :key="key" 
+        v-if="ProperProfileInfoKeys[key]"
         :formKey="key"
-        v-model="formUser[key]"
-        />
+        @update-profile="updateProfile"
+        v-model="profileForm[key]" />
     </template>
   </div>
 </template>
 
 <script setup lang="ts">
-import usersJson from '@/data/users.json'
-import { ProperProfileFormKeys, type FormUser } from '~/models/User';
+import { supabase } from '~/supabase/supabase';
+
+import { ProperProfileInfoKeys } from '~/models/User';
+
+import { useAuthStore } from '~/store/useAuthStore';
+import { useUpsertProfileApi } from '~/composables/api/profiles/useUpsertProfileApi';
+
 
 const router = useRouter()
-const usersData = ref(usersJson)
+const authStore = useAuthStore()
 
-const formUser = reactive<FormUser>(usersData.value[0])
+const { error, loading, params } = useUpsertProfileApi()
 
-watch(formUser, (newForm) => {
-  console.log('====================================');
-  console.log('send post req, param: newForm', newForm);
-  console.log('====================================');
+const profileForm = computed(() => { 
+  return authStore.user ? { ...authStore.user } : undefined
 })
-</script>
+
+function updateProfile() {
+  if (profileForm.value)
+    params.value.profileForm = {...profileForm.value, updated_at: new Date()}
+}
+
+async function signOut() {
+  await supabase.auth.signOut()
+}
+</script>~/composables/api/profiles/useUpdateProfileApi
