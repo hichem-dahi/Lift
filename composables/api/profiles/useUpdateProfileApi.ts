@@ -5,12 +5,12 @@ export interface updateProfileParams {
   profileForm: User | undefined
 }
 
-export function useUpsertProfileApi() {
+export function useUpdateProfileApi() {
   const params = ref<updateProfileParams>({
     profileForm: undefined
   })
 
-  const query = async () => params.value.profileForm ? supabase.from('profiles').upsert(params.value.profileForm) : undefined
+  const query = async () => params.value.profileForm ? supabase.from('profiles').update(params.value.profileForm) : undefined
 
   const state = useAsyncData(() => query(), { watch: [() => params.value.profileForm], immediate: false, lazy: true })
 

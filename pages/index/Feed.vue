@@ -2,7 +2,7 @@
   <FeedBar />
   <div class="feed-wrapper">
     <NewPostCard />
-    <PostCard v-for="post in postsStore.posts" :key="post.id" :post="post" :class="post.id" />
+    <PostCard v-for="(_,i) in posts" :key="i" v-model="posts[i]"  />
   </div>
 </template>
 
@@ -12,8 +12,11 @@ import { usePostsStore } from '~/store/usePostsStore';
 
 const postsStore = usePostsStore()
 
+const posts = computed(() => postsStore.posts)
+
 const getPostsApi = useGetPostsApi()
 getPostsApi.execute()
+
 
 watch(() => getPostsApi.success.value, (success) => {
   if (success && getPostsApi.data.value) {

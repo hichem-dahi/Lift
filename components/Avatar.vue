@@ -20,12 +20,14 @@
 <script setup lang="ts">
 import { useUploadAvatarApi } from '~/composables/api/profiles/useUploadAvatarApi';
 import { useGetAvatarApi } from '~/composables/api/profiles/useGetAvatarApi';
+import { useUpsertProfileApi } from '~/composables/api/profiles/useUpsertProfileApi';
 
-const props = defineProps<{ path: string, size: number }>()
+const props = defineProps<{ path: string, size: number, postId: string | undefined }>()
 const emit = defineEmits(['upload', 'update:path'])
 
 const uploadAvatarApi = useUploadAvatarApi()
 const getAvatarApi = useGetAvatarApi()
+const upsertProfileApi = useUpsertProfileApi()
 
 const { path, size } = toRefs(props)
 const files = ref()
@@ -50,15 +52,28 @@ const uploadAvatar = async (evt: any) => {
 }
 
 watch(() => uploadAvatarApi.success.value, (success) => {
-  if(success) {
-    emit('update:path', uploadAvatarApi.params.value.filePath)
-    emit('upload')
+  if(success && props.postId) {
+    upsertProfileApi.params.value.profileForm = {
+      id: props.postId, 
+      avatar_url:uploadAvatarApi.params.value.filePath  
+    }
   }
 })
 
 watch(path, (newPath) => {
   if(newPath) getAvatarApi.params.value.path = newPath
 }, 
-{ immediate: true })
+{ immediate: true }
+)
 
-</script>~/composables/api/profiles/useGetAvatarApi~/composables/api/profiles/useUploadAvatarApi
+const toast = useToast()
+
+watch(() => upsertProfileApi.success.value, (success) => {
+  if(success) toast.add({title: 'Your avatar has been updated successfully', color: 'blue'})
+})
+
+watch(() => upsertProfileApi.error.value, (error) => {
+  if(error) toast.add({title: 'Your avatar hasn\'t been updated successfully', color: 'red'})
+})
+
+</script>

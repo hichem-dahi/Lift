@@ -8,7 +8,13 @@
     </div>
 
     <div class="new-post-input-actions"> 
-      <UButton @click="submitPost" size="xs" class="btn" color="grey" variant="soft">Post</UButton> 
+      <UButton 
+        size="xs" 
+        class="btn" 
+        color="grey"
+        variant="soft" 
+        @click="submitPost" 
+        :loading="upsertPostApi.loading.value">Post</UButton> 
     </div>
   </UCard>
 </template>
@@ -58,4 +64,13 @@ watch(() => authStore.user, (newUser) => {
 { deep: true, immediate: true }
 )
 
-</script>~/composables/api/profiles/useGetAvatarApi
+const toast = useToast()
+
+watch(() => upsertPostApi.success.value, (success) => {
+  if(success) toast.add({ title: 'Your post has been added successfully', color: 'blue', timeout: 1})
+})
+
+watch(() => upsertPostApi.error.value, (error) => {
+  if(error) toast.add({ title: 'Your post hasn\'t been added', color: 'red', timeout: 1})
+})
+</script>

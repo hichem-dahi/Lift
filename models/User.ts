@@ -15,7 +15,9 @@ export interface User {
 export interface FormUser extends User {
   otp?: string,
   password?: string,
-  confirm_password?: string
+  confirm_password?: string,
+  first_name?: string,
+  last_name?: string
 }
 
 export const ProperProfileInfoKeys: { [K in keyof UserMetadata]?: string } = {

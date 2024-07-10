@@ -3,7 +3,7 @@
     <div class="center-line justify-between">
       <div class="post-card-profile-line font-light">
         <UAvatar class="m-2" :src="avatarSrc" size="sm" />       
-        <div>{{  post.full_name }}</div>
+        <div class="text-md">{{ user.full_name }}</div>
       </div>
       <UPopover>
         <UButton size="2xs" color="grey" icon="i-mdi-dots-vertical" variant="ghost" />
@@ -14,7 +14,6 @@
         </template>
       </UPopover>
     </div>
-   
 
     <div class="post-card-body">{{ post.body }}</div>
 
@@ -57,54 +56,57 @@ import type { Post, PostInfo } from '~/models/Post';
 import { useAuthStore } from '~/store/useAuthStore';
 
 import { useGetAvatarApi } from '~/composables/api/profiles/useGetAvatarApi';
-import { usePostCommentApi } from '~/composables/api/usePostCommentApi';
-import { useGetCommentsApi } from '~/composables/api/useGetCommentsApi';
+import { usePostCommentApi } from '~/composables/api/comments/usePostCommentApi';
+import { useGetCommentsApi } from '~/composables/api/comments/useGetCommentsApi';
 import { useUpdatePostApi } from '~/composables/api/posts/useUpdatePostApi';
 import { useGetPostApi } from '~/composables/api/posts/useGetPostApi';
 import { useDeletePostApi } from '~/composables/api/posts/useDeletePostApi';
+import type { User } from '~/models/User';
 
-//const post = defineModel<PostInfo>()
-const props = defineProps<{post?: PostInfo}>()
+const post = defineModel<Post>()
 const authStore = useAuthStore()
 
 const getAvatarApi = useGetAvatarApi()
 const postCommentApi = usePostCommentApi()
 const getCommentsApi = useGetCommentsApi()
 const updatePostApi = useUpdatePostApi()
-const getPostApi = useGetPostApi()
 const deletePostApi = useDeletePostApi()
 
 const commentsToDisplay = ref(3)
 const showComments = ref(false)
+const toast = useToast()
 
-if (props.post?.id)
-  getCommentsApi.params.value.post_id = props.post?.id
+const user = ref(post.value?.user_id as User) 
 
-if (props.post?.avatar_url)
-  getAvatarApi.params.value.path = props.post.avatar_url
+if (post.value?.id)
+  getCommentsApi.params.value.post_id = post.value?.id
+
+if (user.value.avatar_url)
+  getAvatarApi.params.value.path = user.value.avatar_url
 
 const avatarSrc = computed(() => getAvatarApi.data.value ? URL.createObjectURL(getAvatarApi.data.value) : undefined)
 const comments = computed(() => getCommentsApi.data.value || [])
-const ownPost = computed(() => authStore.user?.id === props.post?.user_id)
+const ownPost = computed(() => authStore.user?.id === user.value.id)
 const isShowMoreComments = computed(() => commentsToDisplay.value < comments.value.length)
-const isLiked = computed(() => authStore.user?.id ? props.post?.user_likes?.includes(authStore.user?.id) : false)
+const isLiked = computed(() => authStore.user?.id ? post.value?.user_likes?.includes(authStore.user?.id) : false)
 
 function likePost() {
-  if (props.post?.user_likes && authStore.user?.id) {
+  if (post.value?.user_likes && authStore.user?.id) {
 
     if (!isLiked.value) {
       updatePostApi.params.value.post = { 
-        id: props.post.id, 
-        user_likes: [...props.post.user_likes, authStore.user?.id], 
+        id: post.value.id, 
+        user_likes: [...post.value.user_likes, authStore.user?.id], 
         updated_at: new Date() 
       } 
     } else if (isLiked.value) {
       updatePostApi.params.value.post = { 
-        id: props.post.id, 
-        user_likes: props.post.user_likes.filter(userId => userId !== authStore.user?.id), 
+        id: post.value.id, 
+        user_likes: post.value.user_likes.filter(userId => userId !== authStore.user?.id), 
         updated_at: new Date()
       } 
-    }}
+    }
+  }
 }
 
 function openComments() {
@@ -120,10 +122,10 @@ function showMoreComments() {
 
 function addComment(body: string) {
   commentsToDisplay.value++
-  if (props.post?.id && authStore.user?.id) {
+  if (post.value?.id && authStore.user?.id) {
     postCommentApi.params.value.comment = { 
       body, 
-      post_id: props.post.id, 
+      post_id: post.value.id, 
       user_id: authStore.user?.id, 
       updated_at: new Date() 
     }
@@ -133,7 +135,7 @@ function addComment(body: string) {
 
 function deletePost() {
   if (ownPost) {
-    deletePostApi.params.value.postId = props.post?.id
+    deletePostApi.params.value.postId = post.value?.id
     deletePostApi.execute()
   }
 }
@@ -145,31 +147,28 @@ watchEffect(() => {
 
 watch(() => updatePostApi.success.value, (success) => {
   if (success) {
-    getPostApi.params.value.postId = props.post?.id
-    getPostApi.execute()
-  }
-})
-
-/*watch(() => getPostApi.success.value, (success) => {
-  if (success && getPostApi.data.value) 
-    props.post = getPostApi.data.value
-  else 
-    props.post = undefined
-  debugger
-})*/
-
-watch(() => deletePostApi.success.value, (success) => {
-  if (success) {
-    getPostApi.params.value.postId = props.post?.id
-    getPostApi.execute()
+    post.value = updatePostApi.data.value || undefined
   }
 })
 
 watch(() => postCommentApi.success.value, (success) => {
   if (success) {
-    getCommentsApi.params.value.post_id = props.post?.id
+    getCommentsApi.params.value.post_id = post.value?.id
     getCommentsApi.execute()
   }
 })
+
+watch(() => deletePostApi.success.value, (success) => {
+  if (success) {
+    toast.add({ title: 'Your post has been deleted successfully', color: 'blue'})
+    post.value = undefined
+  }
+})
+
+
+watch(() => deletePostApi.error.value, (error) => {
+  if(error) toast.add({ title: 'Your post hasn\'t been deleted', color: 'red'})
+})
+
 
 </script>

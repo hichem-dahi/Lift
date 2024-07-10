@@ -16,7 +16,8 @@
     "@supabase/supabase-js": "^2.44.2",
     "nuxt": "^3.12.2",
     "pinia": "^2.1.7",
-    "vue": "latest"
+    "vue": "latest",
+    "yup": "^1.4.0"
   },
   "devDependencies": {
     "typescript": "^5.5.2",

@@ -3,10 +3,12 @@ import type { User } from "./User";
 export interface Post {
   id?: string;
   body?: string;
-  user_id?: string;
+  user_id?: string | User;
   user_likes?: string[];
-  created_at?: Date,
-  updated_at?: Date
+  created_at?: Date;
+  updated_at?: Date;
+
+
 }
 
 export interface PostInfo extends Post, User {}

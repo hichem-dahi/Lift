@@ -9,15 +9,18 @@
   </div>
 
   <div class="center-line justify-center p-2">
-    <Avatar v-if="authStore.user?.avatar_url" v-model:path="authStore.user.avatar_url" @upload="updateProfile" :size="10" />
+    <Avatar v-if="profileForm?.avatar_url" 
+      v-model:path="profileForm.avatar_url" 
+      :postId="profileForm.id"
+      :size="10" />
   </div>
 
-  <div class="p-4">
-    <template v-if="profileForm" v-for="(_, key) in profileForm" :key="key">
+  <div v-if="profileForm" class="p-4">
+    <template v-for="(_, key) in profileForm" :key="key">
       <ProfileLine 
         v-if="ProperProfileInfoKeys[key]"
         :formKey="key"
-        @update-profile="updateProfile"
+        :postId="profileForm?.id"
         v-model="profileForm[key]" />
     </template>
   </div>
@@ -25,28 +28,19 @@
 
 <script setup lang="ts">
 import { supabase } from '~/supabase/supabase';
-
-import { ProperProfileInfoKeys } from '~/models/User';
-
+import { ProperProfileInfoKeys, type User } from '~/models/User';
 import { useAuthStore } from '~/store/useAuthStore';
-import { useUpsertProfileApi } from '~/composables/api/profiles/useUpsertProfileApi';
-
 
 const router = useRouter()
 const authStore = useAuthStore()
 
-const { error, loading, params } = useUpsertProfileApi()
+const profileForm = ref<User>()
 
-const profileForm = computed(() => { 
-  return authStore.user ? { ...authStore.user } : undefined
+watchEffect(() => {
+  profileForm.value = authStore.user
 })
-
-function updateProfile() {
-  if (profileForm.value)
-    params.value.profileForm = {...profileForm.value, updated_at: new Date()}
-}
 
 async function signOut() {
   await supabase.auth.signOut()
 }
-</script>~/composables/api/profiles/useUpdateProfileApi
+</script>

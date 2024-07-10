@@ -2,8 +2,8 @@ import { supabase } from "~/supabase/supabase"
 
 export function useGetPostsApi() {
   const query = async () => supabase
-    .from('postsinfo')
-    .select(`id, body, user_id, username, full_name, avatar_url, user_likes, updated_at, created_at`)
+    .from('posts')
+    .select(`id, body, user_id(id, username, full_name, avatar_url), user_likes, updated_at, created_at`)
 
   const state = useAsyncData('posts', () => query(), { default: undefined, immediate: false});
 
