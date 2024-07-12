@@ -1,11 +1,12 @@
 .feed-wrapper {
   @apply h-screen text-xs pt-12;
-  background-color: #ffffff;
+  background-color: #fefefe;
   color: #575757;
 }
 
 .feedbar {
   @apply flex justify-between items-center p-2 pt-4 bg-white w-full fixed;
+  color: #ab9f9f;
   z-index: 2;
 }
 
@@ -24,7 +25,7 @@
 
 .new-post-card {
   @apply mt-10 mx-4 rounded-3xl;
-  background-color: #F3F3F3;
+  background-color: #fdfdfd;
 }
 
 .new-post-title {
@@ -49,7 +50,7 @@
 
 .post-card {
   @apply shadow-md bg-gray-50 mt-6 px-4 pb-4 z-50;
-  background-color: #f8f8f8;
+  background-color: #fdfdfd;
   border-radius: 4rem;
 }
 

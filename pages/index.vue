@@ -18,9 +18,8 @@ const getAvatarApi = useGetAvatarApi()
 
 onMounted(() => {
   supabase.auth.getSession().then(({ data }) => {
-    if (data.session) {
+    if (data.session) 
       authStore.session = data.session
-    }
   })
 
   supabase.auth.onAuthStateChange(async (_, _session) => {
@@ -35,15 +34,14 @@ onMounted(() => {
 })
 
 watch(() => authStore.session, (newSession) => {
-  if (newSession) {
+  if (newSession) 
     getProfileApi.userId.value = newSession.user.id
-  } 
 })
 
 watch(() => getProfileApi.data.value, (profileData) => {
-  if (profileData) {
+  if (profileData) 
     authStore.user = profileData
-  }
+  
 })
 
 watch(() => authStore.user, (newUser) => {

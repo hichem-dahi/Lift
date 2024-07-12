@@ -1,7 +1,7 @@
-import type { PostInfo } from "~/models/Post"
+import type { Post } from "~/models/Post"
 
 export const usePostsStore = defineStore('postsStore', () => {
-  const posts = ref<PostInfo[]>([])
+  const posts = ref<Post[]>([])
 
   return { posts }
 })

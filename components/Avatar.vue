@@ -1,12 +1,12 @@
 <template>
   <div class="flex flex-col items-center justify-center">  
-    <UAvatar size="xl" :src="avatarSrc" />
-    <div class="text-center p-3" :style="{ width: size + 'em' }">
-      <label class="font-semi-bold text-sm text-blue-500"for="single">
+    <UAvatar size="3xl" :src="avatarSrc" />
+    <div class="flex text-center p-3">
+      <label class="font-semi-bold text-sm text-blue-500" for="single">
         {{ uploadAvatarApi.loading.value ? 'Uploading ...' : 'Edit profile image' }}
       </label>
       <input
-        style="visibility: hidden; position: absolute"
+        class="absolute left-1/3 flex-shrink w-1/2 hidden"
         type="file"
         id="single"
         accept="image/*"
@@ -22,14 +22,14 @@ import { useUploadAvatarApi } from '~/composables/api/profiles/useUploadAvatarAp
 import { useGetAvatarApi } from '~/composables/api/profiles/useGetAvatarApi';
 import { useUpsertProfileApi } from '~/composables/api/profiles/useUpsertProfileApi';
 
-const props = defineProps<{ path: string, size: number, postId: string | undefined }>()
+const props = defineProps<{postId: string | undefined }>()
 const emit = defineEmits(['upload', 'update:path'])
 
 const uploadAvatarApi = useUploadAvatarApi()
 const getAvatarApi = useGetAvatarApi()
 const upsertProfileApi = useUpsertProfileApi()
 
-const { path, size } = toRefs(props)
+const path = defineModel<string>()
 const files = ref()
 
 const avatarSrc = computed(() => {
@@ -55,7 +55,7 @@ watch(() => uploadAvatarApi.success.value, (success) => {
   if(success && props.postId) {
     upsertProfileApi.params.value.profileForm = {
       id: props.postId, 
-      avatar_url:uploadAvatarApi.params.value.filePath  
+      avatar_url: uploadAvatarApi.params.value.filePath  
     }
   }
 })
@@ -68,8 +68,11 @@ watch(path, (newPath) => {
 
 const toast = useToast()
 
-watch(() => upsertProfileApi.success.value, (success) => {
-  if(success) toast.add({title: 'Your avatar has been updated successfully', color: 'blue'})
+watch(() => upsertProfileApi.success.value, (success) => { 
+  if (success) {
+    path.value = uploadAvatarApi.params.value.filePath 
+    toast.add({title: 'Your avatar has been updated successfully', color: 'blue'})
+  }
 })
 
 watch(() => upsertProfileApi.error.value, (error) => {

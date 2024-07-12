@@ -24,6 +24,5 @@ export function useUpdatePostApi() {
   const loading = computed(() =>  state.status.value == 'pending' ? true : false)
   const success = computed(() =>  state.status.value == 'success' ? true : false)
 
-
   return { data, error, success, loading, params }
 }
